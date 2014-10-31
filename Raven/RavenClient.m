@@ -25,6 +25,12 @@ NSString *const sentryClient = @"raven-objc/0.4.0";
 
 static RavenClient *sharedClient = nil;
 
+@interface RavenClient ()
+
+@property (nonatomic, strong) NSOperationQueue *connectionQueue;
+
+@end
+
 @implementation RavenClient
 
 void exceptionHandler(NSException *exception) {
@@ -390,7 +396,12 @@ void exceptionHandler(NSException *exception) {
     [request setHTTPBody:JSON];
     [request setValue:header forHTTPHeaderField:@"X-Sentry-Auth"];
 
-    NSURLConnection *connection = [NSURLConnection connectionWithRequest:request delegate:self];
+    NSURLConnection *connection = [[NSURLConnection alloc] initWithRequest:request
+                                                                  delegate:self
+                                                          startImmediately:NO];
+    [connection setDelegateQueue:self.connectionQueue];
+    [connection start];
+  
     if (connection) {
         self.receivedData = [NSMutableData data];
     }
