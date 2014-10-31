@@ -123,6 +123,7 @@ void exceptionHandler(NSException *exception) {
         self.extra = extra;
         self.tags = tags;
         self.logger = logger;
+        self.connectionQueue = [[NSOperationQueue alloc] init];
 
         // Parse DSN
         if (![self.config setDSN:DSN]) {
